@@ -113,6 +113,61 @@ class MovieParseResult(object):
         )
 
 
+class MusicParseResult(object):
+    def __init__(
+        self,
+        data=None,
+        artist=None,
+        album=None,
+        year=None,
+        quality=None,
+        valid=True,
+    ):
+        self.data = data
+        self.artist = artist
+        self.album = album
+        self.year = year
+        self.quality = quality if quality is not None else Quality()
+        self.valid = valid
+
+    @property
+    def identifier(self):
+        if self.artist and self.album and self.year:
+            return ('%s - %s - %s' % (self.artist, self.year, self.album)).strip().lower()
+        elif self.artist and self.album:
+            return ('%s - %s' % (self.artist, self.album)).strip().lower()
+        elif self.artist:
+            return self.artist.lower()
+
+    @property
+    def fields(self):
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'id': self.identifier,
+            'music_parser': self,
+            'music_artist': self.artist,
+            'music_album': self.album,
+            'music_year': self.year,
+        }
+
+    def __str__(self):
+        valid = 'OK' if self.valid else 'INVALID'
+        return (
+            '<MusicParseResult(data=%s,artist=%s,album=%s,year=%s,id=%s,quality=%s,status=%s)>'
+            % (
+                self.data,
+                self.artist,
+                self.album,
+                self.year,
+                self.identifier,
+                self.quality,
+                valid,
+            )
+        )
+
+
 class SeriesParseResult(object):
     def __init__(
         self,

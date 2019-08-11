@@ -19,7 +19,7 @@ from flexget.utils import qualities
 from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes, name_to_re
 from flexget.utils.tools import ReList
 
-from .parser_common import MovieParseResult, SeriesParseResult
+from .parser_common import MovieParseResult, MusicParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_guessit')
 
@@ -194,6 +194,27 @@ class ParserGuessit(object):
             proper_count=self._proper_count(guess_result),
             quality=self._quality(guess_result),
             release_group=guess_result.get('release_group'),
+            valid=bool(
+                guess_result.get('title')
+            ),  # It's not valid if it didn't find a name, which sometimes happens
+        )
+        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
+        return parsed
+
+    # music_parser API
+    def parse_music(self, data, **kwargs):
+        log.debug('Parsing music: `%s` [options: %s]', data, kwargs)
+        start = preferred_clock()
+        guessit_options = self._guessit_options(kwargs)
+        guessit_options['type'] = 'music'
+        guess_result = guessit_api.guessit(data, options=guessit_options)
+        # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
+        parsed = MusicParseResult(
+            data=data,
+            artist=guess_result.get('title'),
+            album=guess_result.get('alternative_title'),
+            year=guess_result.get('year'),
+            quality=self._quality(guess_result),
             valid=bool(
                 guess_result.get('title')
             ),  # It's not valid if it didn't find a name, which sometimes happens
@@ -429,5 +450,5 @@ class ParserGuessit(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(
-        ParserGuessit, 'parser_guessit', interfaces=['movie_parser', 'series_parser'], api_ver=2
+        ParserGuessit, 'parser_guessit', interfaces=['movie_parser', 'music_parser', 'series_parser'], api_ver=2
     )
