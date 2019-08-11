@@ -100,6 +100,54 @@ class MovieParseResult:
         )
 
 
+class MusicParseResult:
+    def __init__(
+        self,
+        data: Optional[str] = None,
+        artist: Optional[str] = None,
+        album: Optional[str] = None,
+        year: Optional[int] = None,
+        quality: Quality = None,
+        valid: bool = True,
+    ) -> None:
+        self.artist: str = artist
+        self.data: str = data
+        self.album: Optional[str] = album
+        self.year: Optional[int] = year
+        self.quality: Quality = quality if quality is not None else Quality()
+        self.valid: bool = valid
+
+    @property
+    def identifier(self):
+        if self.artist and self.album and self.year:
+            return (f'{self.artist} - {self.year} - {self.album}').strip().lower()
+        elif self.artist and self.album:
+            return (f'{self.artist} - {self.album}').strip().lower()
+        elif self.artist:
+            return self.artist.lower()
+
+    @property
+    def fields(self) -> dict:
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'id': self.identifier,
+            'music_parser': self,
+            'music_artist': self.artist,
+            'music_album': self.album,
+            'music_year': self.year,
+        }
+
+    def __str__(self) -> str:
+        valid = 'OK' if self.valid else 'INVALID'
+        return (
+            f'<MusicParseResult(data={self.data},artist={self.artist},'
+            f'album={self.album},year={self.year},id={self.identifier},'
+            f'quality={self.quality},status={valid})>'
+        )
+
+
 class SeriesParseResult:
     def __init__(
         self,
