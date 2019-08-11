@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.event import event
 
 logger = logger.bind(name='parsing')
-PARSER_TYPES = ['movie', 'series']
+PARSER_TYPES = ['movie', 'music', 'series']
 
 # Mapping of parser type to (mapping of parser name to plugin instance)
 parsers = {}
@@ -86,6 +86,16 @@ class PluginParsing:
         parser = parsers['movie'][selected_parsers.get('movie') or default_parsers['movie']]
         return parser.parse_movie(data, **kwargs)
 
+    def parse_music(self, data, **kwargs):
+        """
+        Use the selected music parser to parse music information from `data`
+
+        :param data: The raw string to parse information from
+
+        :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
+        """
+        parser = parsers['music'][selected_parsers.get('music') or default_parsers['music']]
+        return parser.parse_music(data, **kwargs)
 
 @event('plugin.register')
 def register_plugin():
