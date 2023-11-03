@@ -13,7 +13,7 @@ logger = logger.bind(name='rutracker')
 class SiteRutracker:
     schema = {'type': 'boolean'}
 
-    base_url = 'https://api.t-ru.org'
+    base_url = 'https://api.rutracker.cc'
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
